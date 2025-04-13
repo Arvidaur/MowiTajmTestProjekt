@@ -183,14 +183,6 @@ public class SimpleFormSteps
         }
     }
 
-
-
-
-
-
-
-
-
     [When("I press the register button")]
     public async Task WhenIPressTheRegisterButton()
     {
@@ -204,26 +196,24 @@ public class SimpleFormSteps
         Assert.Equal("Registrera Konto", heading);
     }
 
-    //    Given I am on the Admin Page
     [Given("I am on the Admin Page")]
     public async Task GivenIAmOnTheAdminPage()
     {
         await _page.GotoAsync("https://localhost:7295/Identity/Admin");
         await _page.WaitForLoadStateAsync(LoadState.NetworkIdle); // Vänta på att sidan ska ladda klart
     }
-    //And I see the Recensioner List
     [When("I press the Hantera recensioner button")]
     public async Task WhenIPressTheHanteraRecensionerButton()
     { 
         await _page.ClickAsync("button:has-text('Hantera recensioner')");
     }
-    //When I select "<dropdown>" from the rating filter
+
     [When(@"I select ""(.*)"" from the rating filter")]
     public async Task WhenISelectFromTheRatingFilter(string rating)
     {
         await _page.SelectOptionAsync("#ratingFilter", rating);
     }
-    //    Then I should see reviews with "<rating>"
+
     [Then(@"I should see reviews with ""(.*)""")]
     public async Task ThenIShouldSeeReviewsWith(string expectedRating)
     {
