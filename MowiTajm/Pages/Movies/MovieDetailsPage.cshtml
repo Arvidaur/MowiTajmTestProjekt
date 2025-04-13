@@ -1,0 +1,269 @@
+@page
+@model MowiTajm.Pages.Movies.MovieDetailsPageModel
+@{
+	ViewData["Title"] = Model.Movie.Title;
+
+	// Hämtar rätt recensioner att visa beroende på om stjärnfilter är aktivt eller inte.
+	var reviewsToDisplay = Model.IsStarFilterActive ? Model.FilteredReviews : Model.Reviews;
+}
+
+@if (Model.Movie != null)
+{
+	<div class="page-content-container">
+
+		@* Filmpresentationen *@
+		<article class="article-full-movie">
+
+			@* Filmposter *@
+			<section id="section-poster">
+				<img class="movie-full-poster" src="@Model.Movie.Poster" alt="Filmposter för @Model.Movie.Title"/>
+			</section>
+
+			@* Filminformation *@
+			<div class="section-details-wrapper">
+				<section id="section-details">
+					<p>@Model.Movie.Year | @Model.Movie.Runtime</p>
+					<h1>@Model.Movie.Title</h1>
+					<p>@Model.Movie.Genre</p>
+					<div class="orientation-row">
+						<p class="bolder">IMDB Rating:</p>
+						<p>@Model.Movie.ImdbRating / 10</p>
+					</div>
+
+					@* MowiTajm-rating *@
+					<div class="orientation-row">
+						<p class="bolder">MowiTajm Rating:</p>
+						@if (Model.Reviews.Any())
+						{
+							<p>@ViewData["MowiTajmRating"] / 5</p>
+						}
+						else
+						{
+							<p>Betyg saknas</p>
+						}
+					</div>
+
+					<p>@Model.Movie.Plot</p>
+					<div class="orientation-row">
+						<p class="bolder">Director:</p>
+						<p>@Model.Movie.Director</p>
+					</div>
+					<div class="orientation-row">
+						<p class="bolder">Writers:</p>
+						<p>@Model.Movie.Writer</p>
+					</div>
+					<div class="orientation-row">
+						<p class="bolder">Actors:</p>
+						<p>@Model.Movie.Actors</p>
+					</div>
+					<div class="orientation-row">
+						<p class="bolder">Awards:</p>
+						<p>@Model.Movie.Awards</p>
+					</div>
+				</section>
+			</div>
+		</article>
+
+		@* Filmecensionsheader *@
+		<header class="reviews-header">
+			<div class="review-title-wrapper">
+
+				@* Titel med antal recensioner *@
+				<h2 id="reviews-title">Recensioner (@reviewsToDisplay.Count())</h2>
+			</div>
+
+			@* Stjärnfilter *@
+			<div class="stars-filter-wrapper">
+
+				@* Datumfilter *@
+				<form method="post" asp-page-handler="DateFilter">
+					<input type="hidden" name="Review.ImdbID" value="@Model.Movie.ImdbID" />
+					<button type="submit" class="btn-design btn-white" title="Sortera på datum" aria-label="Sortera på datum">
+						@Model.DateSortText
+					</button>
+				</form>
+				<form method="post" asp-page-handler="StarFilter">
+					<input type="hidden" name="Review.ImdbID" value="@Model.Movie.ImdbID" />
+
+					<fieldset class="stars-filter">
+						<legend>Filtrera recensioner efter betyg</legend> @* Döljs visuellt *@
+
+						<div class="stars-filter-stars" title="Filtrera på antal stjärnor">
+							<input class="stars-filter-hidden-star" type="radio" id="searchAll" value="0" asp-for="FilterValue" onchange="this.form.submit();">
+							<label class="btn-design btn-white" for="searchAll" title="Återställ filtret" aria-label="Återställ filtret">Återställ </label>
+
+							<input class="stars-filter-hidden-star" type="radio" id="searchStar5" value="5" asp-for="FilterValue" onchange="this.form.submit();">
+							<label class="stars-filter-star" for="searchStar5">★ </label>
+
+							<input class="stars-filter-hidden-star" type="radio" id="searchStar4" value="4" asp-for="FilterValue" onchange="this.form.submit();">
+							<label class="stars-filter-star" for="searchStar4">★ </label>
+
+							<input class="stars-filter-hidden-star" type="radio" id="searchStar3" value="3" asp-for="FilterValue" onchange="this.form.submit();">
+							<label class="stars-filter-star" for="searchStar3">★ </label>
+
+							<input class="stars-filter-hidden-star" type="radio" id="searchStar2" value="2" asp-for="FilterValue" onchange="this.form.submit();">
+							<label class="stars-filter-star" for="searchStar2">★ </label>
+
+							<input class="stars-filter-hidden-star" type="radio" id="searchStar1" value="1" asp-for="FilterValue" onchange="this.form.submit();">
+							<label class="stars-filter-star" for="searchStar1">★ </label>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</header>
+
+		@* Skrollposition vid användning av filter *@
+		@if (TempData["ScrollToReviews"] as bool? == true)
+		{
+			<script>
+				window.scrollToReviews = true;
+			</script>
+			TempData.Remove("ScrollToReviews");
+		}
+
+		@* Alla filmrecensioner *@
+		<section class="section-all-reviews" id="IdAllReviews">
+			@if (!reviewsToDisplay.Any())
+			{
+				@* Om användaren är inloggad, visar ett meddelande om att ingen har skrivit någon recension än *@
+				@if (Model.IsUserSignedIn)
+				{
+					<p class="text-no-reviews-yet">Ingen har skrivit en recension än, bli den första!</p>
+				}
+			}
+			else
+			{
+				@foreach (var review in reviewsToDisplay)
+				{
+					@* Filmrecensionen *@
+					<article class="review-full">
+
+						@* Namn och betyg *@
+						<header class="review-head">
+							<p class="review-meta" style="font-family: Arial, sans-serif;">
+								<span class="review-name bolder">@review.Username</span>
+								<span class="review-stars" aria-label="Betyg: @review.Rating av 5 stjärnor">
+									@for (int i = 0; i < review.Rating; i++)
+									{
+										<label class="star">★</label>
+									}
+								</span>
+							</p>
+						</header>
+
+						@* Rubrik och recension *@
+						<section class="review-body">
+							<p class="less-bolder review-title-mobile-wrap">@review.Title</p>
+							<button class="btn btn-link btn-white btn-read-more text-decoration-none" data-bs-toggle="collapse" data-bs-target="#reviewText-@review.Id"
+									aria-expanded="false">
+								Läs mer..
+							</button>
+							<div class="collapse" id="reviewText-@review.Id">
+								<p>@review.Text</p>
+							</div>
+						</section>
+
+						@* Datum och knappar *@
+						<footer class="review-footer">
+							<p class="date-time-text">@review.DateTime</p>
+							@if (Model.IsUserSignedIn && review.Username == Model.UserContext.DisplayName)
+							{
+								@* Användaren får edit- och delete-knapp på sina egna recensioner *@
+								<div class="review-buttons">
+									<a class="btn-design btn-black" title="Redigera recensionen" aria-label="Redigera recensionen" asp-page="EditReviewPage" asp-route-id="@review.Id"
+									   onclick="return confirm('Vill du redigera ditt inlägg?')">✎ᝰ.</a>
+									<form method="post" asp-page-handler="Delete" asp-route-id="@review.Id">
+										<input type="hidden" asp-for="Review.ImdbID" value="@Model.Movie.ImdbID" />
+										<button class="btn-design btn-red" type="submit" title="Ta bort recensionen" aria-label="Ta bort recensionen"
+												onclick="return confirm('Är du säker på att du vill ta bort recensionen?')">⛌</button>
+									</form>
+								</div>
+							}
+							else if (Model.IsUserSignedIn && Model.UserContext.IsAdmin)
+							{
+								@* Admin får delete-knapp på alla recensioner *@
+								<div class="review-buttons">
+									<form method="post" asp-page-handler="Delete" asp-route-id="@review.Id">
+										<input type="hidden" asp-for="Review.ImdbID" value="@Model.Movie.ImdbID" />
+										<button class="btn-design btn-red" type="submit" title="Ta bort recensionen" aria-label="Ta bort recensionen"
+												onclick="return confirm('Är du säker på att du vill ta bort recensionen?')">⛌</button>
+									</form>
+								</div>
+							}
+						</footer>
+					</article>
+				}
+			}
+		</section>
+
+		@* Lägger till texten längst ner om användaren inte är inloggad *@
+		@if (!Model.IsUserSignedIn)
+		{
+			<p>
+				@* Länk till inloggningssidan. Vi använder asp-area="Identity" om Identity-området används *@
+				<a asp-area="Identity" asp-page="/Account/Login">Logga in</a> eller
+
+				@* Länk till registreringssidan. Även här används asp-area="Identity" för att peka rätt *@
+				<a asp-area="Identity" asp-page="/Account/Register">registrera dig</a> om du vill skriva en recension.
+			</p>
+		}
+
+		@if (Model.IsUserSignedIn)
+		{
+			<h2 id="text-write-a-review">Skriv en recension</h2>
+
+			@* Formulär för att skriva en recension *@
+			<section class="review-input-container">
+
+				@* Filmtitel *@
+				<h2 class="center-stuff review-input-movie-title"> @Model.Movie.Title</h2> 
+				<form class="review-input-form" method="post" asp-page-handler="AddReview">
+
+					@* Dold filmreferens *@
+					<input type="hidden" asp-for="Review.ImdbID" value="@Model.Movie.ImdbID"/>
+					<input type="hidden" asp-for="Review.MovieTitle" value="@Model.Movie.Title"/>
+
+					<fieldset class="review-input-head">
+						<legend>Filtrera recensioner genom att välja antal stjärnor. 1 är lägst och 5 är högst.</legend> @* Döljs visuellt *@
+
+						@* Hämtar användarnamn som readonly för att användaren inte ska kunna ändra det. *@
+						<input class="review-input-name" type="text" value="@Model.UserContext.DisplayName" asp-for="Review.Username" required readonly /><br /> @* Ändrade så att den lägger till user direkt *@
+
+						@* Stjärnval för betyg *@
+						<div class="review-input-stars" title="Välj antal stjärnor att ge i betyg">
+							<input class="review-input-hidden-star" type="radio" id="star5" value="5" asp-for="Review.Rating">
+							<label class="review-input-star" for="star5">★ </label>
+
+							<input class="review-input-hidden-star" type="radio" id="star4" value="4" asp-for="Review.Rating">
+							<label class="review-input-star" for="star4">★ </label>
+
+							<input class="review-input-hidden-star" type="radio" id="star3" value="3" asp-for="Review.Rating">
+							<label class="review-input-star" for="star3">★ </label>
+
+							<input class="review-input-hidden-star" type="radio" id="star2" value="2" asp-for="Review.Rating">
+							<label class="review-input-star" for="star2">★ </label>
+
+							<input class="review-input-hidden-star" type="radio" id="star1" value="1" asp-for="Review.Rating">
+							<label class="review-input-star" for="star1">★ </label>
+						</div>
+					</fieldset>
+
+					@* Rubrik*@
+					<input class="review-input-title form-control me-2" type="text" class="review-input-title" placeholder="Rubrik.." asp-for="Review.Title" required maxlength="50" />
+
+					@* Textarea för recension *@
+					<textarea class="review-input-text form-control me-2" placeholder="Vad tyckte du om filmen?" asp-for="Review.Text" required maxlength="1000"></textarea> <br />
+
+					<footer class="review-input-btn-submit">
+						<button class="btn-design btn-black" title="Publicera recension" aria-label="Publicera recension" type="submit"
+								onclick="return confirm('Vill du publicera din recension?')">➤</button>
+					</footer>
+				</form>
+			</section>
+		}
+	</div>
+}
+else
+{
+	<p>Filminformation kunde inte hämtas. Recensioner kan inte skrivas utan filmdata.</p>
+}

@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MowiTajm</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MowiTajm.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-xl navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid d-flex align-items-center">
+
+                @* Logotyp + sökruta tillsammans *@
+                <div class="d-flex align-items-center">
+
+                    @if (Context?.Request?.Path.Value?.Equals("/Movies", StringComparison.OrdinalIgnoreCase) ?? false)
+                    {
+                        <a class="logotyp-start" asp-area="" asp-page="/Index">
+                            <img src="~/images/MowiTajmLogo.png" alt="MowiTajm">
+                        </a>
+                    }else{
+                        <a class="logotyp" asp-area="" asp-page="/Index">
+                            <img src="~/images/MowiTajmLogo.png" alt="MowiTajm">
+                        </a>
+                    }
+
+                    @if (!Context?.Request?.Path.Value?.Equals("/Movies", StringComparison.OrdinalIgnoreCase) ?? false)
+                    {
+                        <form method="get" asp-page="/Movies/Index" class="navbar-search d-flex align-items-center">
+                            <input class="form-control me-2" type="text" name="searchInput" id="navbarSearch"
+                                   value="@Context?.Request.Query["searchInput"]" placeholder="Sök på en titel.." required maxlength="100">
+                            <button class="btn btn-primary" title="Sök" aria-label="Sök" type="submit">⌕</button>
+                        </form>
+                    }
+                </div>
+
+                @* Hamburgermenyn *@
+                <button class="navbar-toggler menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                @* Menyknappar *@
+                <div id="navbarNav" class="navbar-collapse collapse justify-content-end">
+                    <partial name="_LoginPartial" />
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container text-center">
+            &copy; 2025 - MowiTajm 
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

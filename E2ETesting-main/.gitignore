@@ -1,0 +1,48 @@
+## Build and Publish folders
+bin/
+obj/
+out/
+
+## Rider-specific
+.idea/
+*.sln.iml
+
+## Visual Studio-specific
+.vs/
+*.user
+*.suo
+
+## SpecFlow generated files
+*.feature.cs
+*.feature*.cs
+
+## Playwright stuff
+.playwright/
+playwright-report/
+test-results/
+
+## Logs
+*.log
+*.log.*
+
+## Environment
+.env
+.env.*
+
+## OS-specific
+.DS_Store
+Thumbs.db
+
+## Backup files
+*~
+*.tmp
+*.bak
+*.swp
+
+## JetBrains / ReSharper cache
+_ReSharper*/
+*.DotSettings.user
+
+## Test screenshots/videos (optional if you capture them)
+screenshots/
+videos/
