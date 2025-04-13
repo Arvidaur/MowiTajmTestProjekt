@@ -2,7 +2,7 @@
 
 Feature: Login attempts and navigation
 
-loggar in med två existerande användare och testar sedan att logga in med fel användarinformation och testar att navigera runt på sidan
+loggar in med två existerande användare och testar sedan att logga in med fel användarinformation och testar att navigera runt på sidan samt testar att sortera betyg på admin sidan
 
 Scenario Outline: Successful login and logout
     Given I am on the homepage
